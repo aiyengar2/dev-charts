@@ -1,0 +1,812 @@
+questions:
+# General
+- variable: namespaceOverride
+  group: General
+  label: Deployment Namespace
+  type: string
+  default: rancher-monitoring-v2
+  min_length: 1
+  description: If modified, you will also need to change the Prometheus Adapter Prometheus URL 
+  required: true
+- variable: provider
+  group: General
+  label: Distribution
+  description: The type of Kubernetes distribution to configure monitoring for
+  type: enum
+  options:
+  - RKE
+  - k3s
+  - kubeAdm
+  - EKS / GKE / AKS
+  - Custom
+  required: true
+- variable: prometheus.enabled
+  group: General
+  label: Deploy Prometheus
+  description: Deploys a Prometheus server to the cluster
+  type: boolean
+  required: true
+  default: true
+- variable: grafana.enabled
+  group: General
+  label: Deploy Grafana
+  description: Allows you to visualize graphs on metrics collected by Prometheus
+  type: boolean
+  required: true
+  default: true
+- variable: prometheusOperator.enabled
+  group: General
+  label: Deploy Prometheus Operator
+  description: Only one of these should be deployed into the cluster
+  type: boolean
+  required: true
+  default: true
+- variable: prometheus-adapter.enabled
+  group: General
+  label: Deploy Prometheus Adapter
+  description: Implements the k8s Custom Metrics API for metrics emitted by Prometheus
+  type: boolean
+  required: true
+  default: true
+- variable: defaultRules.create
+  group: General
+  label: Create Default PrometheusRules
+  description: Creates several PrometheusRule CRs that set up default alerting and recording rules
+  type: boolean
+  required: true
+  default: true
+- variable: grafana.defaultDashboardsEnabled
+  group: General
+  label: Create Default Grafana Dashboards
+  description: Creates several ConfigMaps that set up some default dashboards on Grafana
+  type: boolean
+  required: true
+  default: true
+- variable: deployExporters
+  group: General
+  label: Configure Default Exporters
+  description: Configures which exporters to deploy by default for monitoring. If not configured, no exporters are deployed.
+  type: boolean
+  required: true
+  default: true
+- variable: monitoringRoles.create
+  group: General
+  label: Create Default ClusterRoles for Monitoring
+  description: Creates some default ClusterRoles for Monitoring
+  type: boolean
+  required: true
+  default: true
+- variable: monitoringRoles.aggregateRolesForRBAC
+  group: General
+  label: Aggregate Monitoring Roles into Default K8s Roles
+  description: Adds labels to the Monitoring ClusterRoles to allow them to aggregate into their respective k8s ClusterRoles
+  type: boolean
+  required: false
+  default: false
+  shof_if: "monitoringRoles.create=true"
+# Exporters
+- variable: nodeExporter.enabled
+  group: Exporters
+  label: Export Node Exporter Metrics
+  description: Exposes metrics on the hardware and kernel of each node via a Prometheus exporter
+  type: boolean
+  default: false
+  show_if: "deployExporters=true"
+- variable: kubeStateMetrics.enabled
+  group: Exporters
+  label: Export Kube State Metrics
+  description: Exposes metrics on the conditions of Kubernetes objects via a Prometheus exporter
+  type: boolean
+  default: false
+  show_if: "deployExporters=true"
+- variable: coreDns.enabled
+  group: Exporters
+  label: Export CoreDNS Metrics
+  description: Enables scraping CoreDNS metrics via a Prometheus exporter. KubeDNS should be disabled.
+  type: boolean
+  default: false
+  show_if: "deployExporters=true"
+- variable: kubeDns.enabled
+  group: Exporters
+  label: Export KubeDNS Metrics
+  description: Enables scraping kube-dns metrics via a Prometheus exporter. CoreDNS should be disabled.
+  type: boolean
+  default: false
+  show_if: "deployExporters=true"
+- variable: kubelet.enabled
+  group: Exporters
+  label: Export Kubelet Metrics
+  description: Enables scraping kubelet metrics via a Prometheus exporter
+  type: boolean
+  default: false
+  show_if: "deployExporters=true"
+- variable: rkeScheduler.enabled
+  group: Exporters - PushProx
+  label: Export Kube Scheduler Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-scheduler metrics from RKE
+  default: false
+  show_if: "deployExporters=true&&provider=RKE"
+- variable: rkeControllerManager.enabled
+  group: Exporters - PushProx
+  label: Export Kube Controller Manager Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-controller-manager metrics from RKE
+  default: false
+  show_if: "deployExporters=true&&provider=RKE"
+- variable: rkeProxy.enabled
+  group: Exporters - PushProx
+  label: Export Kube Proxy Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-proxy metrics from RKE
+  default: false
+  show_if: "deployExporters=true&&provider=RKE"
+- variable: rkeEtcd.enabled
+  group: Exporters - PushProx
+  label: Export Etcd Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping etcd metrics from RKE
+  default: false
+  show_if: "deployExporters=true&&provider=RKE"
+- variable: k3sScheduler.enabled
+  group: Exporters - PushProx
+  label: Export Kube Scheduler Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-scheduler metrics from k3s
+  default: false
+  show_if: "deployExporters=true&&provider=k3s"
+- variable: k3sControllerManager.enabled
+  group: Exporters - PushProx
+  label: Export Kube Controller Manager Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-controller-manager metrics from k3s
+  default: false
+  show_if: "deployExporters=true&&provider=k3s"
+- variable: k3sProxy.enabled
+  group: Exporters - PushProx
+  label: Export Kube Proxy Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-proxy metrics from k3s
+  default: false
+  show_if: "deployExporters=true&&provider=k3s"
+- variable: kubeAdmScheduler.enabled
+  group: Exporters - PushProx
+  label: Export Kube Scheduler Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-scheduler metrics from kubeAdm
+  default: false
+  show_if: "deployExporters=true&&provider=kubeAdm"
+- variable: kubeAdmControllerManager.enabled
+  group: Exporters - PushProx
+  label: Export Kube Controller Manager Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-controller-manager metrics from kubeAdm
+  default: false
+  show_if: "deployExporters=true&&provider=kubeAdm"
+- variable: kubeAdmProxy.enabled
+  group: Exporters - PushProx
+  label: Export Kube Proxy Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping kube-proxy metrics from kubeAdm
+  default: false
+  show_if: "deployExporters=true&&provider=kubeAdm"
+- variable: kubeAdmEtcd.enabled
+  group: Exporters - PushProx
+  label: Export Etcd Metrics
+  type: boolean
+  description: Creates PushProx proxies and clients for scraping etcd metrics from kubeAdm
+  default: false
+  show_if: "deployExporters=true&&provider=kubeAdm"
+- variable: kubeScheduler.enabled
+  group: Exporters
+  label: Export Kube Scheduler Metrics
+  type: boolean
+  description: Enables scraping kube-scheduler metrics via a Prometheus exporter.
+  default: false
+  show_if: "deployExporters=true&&provider=Custom"
+- variable: kubeControllerManager.enabled
+  group: Exporters
+  label: Export Kube Controller Manager Metrics
+  type: boolean
+  description: Enables scraping kube-controller-manager metrics via a Prometheus exporter.
+  default: false
+  show_if: "deployExporters=true&&provider=Custom"
+- variable: kubeProxy.enabled
+  group: Exporters
+  label: Export Kube Proxy Metrics
+  type: boolean
+  description: Enables scraping kube-proxy metrics via a Prometheus exporter.
+  default: false
+  show_if: "deployExporters=true&&provider=Custom"
+- variable: kubeEtcd.enabled
+  group: Exporters
+  label: Export Etcd Metrics
+  type: boolean
+  description: Enables scraping etcd metrics via a Prometheus exporter.
+  default: false
+  show_if: "deployExporters=true&&provider=Custom"
+# Prometheus
+- variable: prometheus.prometheusSpec.scrapeInterval
+  group: Prometheus
+  label: Scrape Interval
+  description: Sets the default interval between consecutive scrapes
+  type: string
+  # valid_chars: "([0-9]+[smhdwy])?"
+  default: 1m
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.prometheusSpec.evaluationInterval
+  group: Prometheus
+  label: Evaluation Interval
+  description: Sets the default interval between consecutive evaluations
+  type: string
+  # valid_chars: "([0-9]+[smhdwy])?"
+  default: 1m
+  show_if: "prometheus.enabled=true"
+- variable: setPrometheusCustomResourceSelectors
+  group: Prometheus
+  label: Configure Prometheus CR Selectors
+  description: If false, all Prometheus CRs in the deployment namespace are selected
+  type: boolean
+  required: true
+  default: false
+  show_if: "prometheus.enabled=true"
+- variable: setPrometheusPersistenceStorage
+  group: Prometheus
+  label: Enable Persistent Storage
+  description: Use Persistent Volume Claims to store data
+  required: true
+  type: boolean
+  default: false
+  show_if: "prometheus.enabled=true"
+- variable: setPrometheusResourceLimits
+  group: Prometheus
+  label: Set Custom Resource Limits & Requests
+  description: Set custom resource limits and requests on the Prometheus deployment
+  type: boolean
+  required: true
+  default: false
+  show_if: "prometheus.enabled=true"
+- variable: setPrometheusSchedulingConstraints
+  group: Prometheus
+  label: Set Custom Scheduling Constraints
+  description: Set custom nodeSelector, tolerations, and affinities for the Prometheus deployment
+  type: boolean
+  required: true
+  default: false
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.prometheusSpec.enableAdminAPI
+  group: Prometheus
+  label: Enable Admin API
+  description: Enables the Prometheus administrative HTTP API which includes functionality such as deleting time series
+  type: boolean
+  required: true
+  default: false
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.prometheusSpec.replicas
+  group: Prometheus
+  label: Number of Replicas
+  type: int
+  min: 1
+  required: true
+  default: 1
+  show_if: "prometheus.enabled=true"
+# Prometheus - Service Monitors
+- variable: prometheus.prometheusSpec.serviceMonitorNamespaceSelector
+  group: Prometheus - Service Monitors
+  label: Select Namespaces by Label
+  type: string
+  description: Selects namespaces by the labels attached to the namespace. By default, search the deployment namespace.
+  show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
+- variable: prometheus.prometheusSpec.serviceMonitorSelector
+  group: Prometheus - Service Monitors
+  label: Select ServiceMonitors by Label
+  description: Selects ServiceMonitors by the labels attached to the resource. By default, all resources are selected.
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
+# Prometheus - Pod Monitors
+- variable: prometheus.prometheusSpec.podMonitorNamespaceSelector
+  group: Prometheus - Pod Monitors
+  label: Select Namespaces by Label
+  type: string
+  description: Selects namespaces by the labels attached to the namespace. By default, search the deployment namespace.
+  show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
+- variable: prometheus.prometheusSpec.podMonitorSelector
+  group: Prometheus - Pod Monitors
+  label: Select PodMonitors by Labels
+  description: Selects PodMonitors by the labels attached to the resource. By default, all resources are selected.
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
+# Prometheus - Prometheus Rules
+- variable: prometheus.prometheusSpec.rulesNamespaceSelector
+  group: Prometheus - Prometheus Rules
+  label: Select Namespaces by Label
+  description: Selects namespaces by the labels attached to the namespace. By default, search the deployment namespace.
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
+- variable: prometheus.prometheusSpec.rulesSelector
+  group: Prometheus - Prometheus Rules
+  label: Select PrometheusRules by Label
+  description: Selects PrometheusRules by the labels attached to the resource. By default, all resources are selected.
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
+# Prometheus - Storage
+- variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.accessModes
+  group: Prometheus - Storage
+  label: Access Modes
+  type: enum
+  options:
+  - ReadWriteOnce
+  - ReadOnlyMany
+  - ReadWriteMany
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+- variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName
+  group: Prometheus - Storage
+  label: Storage Class
+  type: storageclass
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+- variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.volumeMode
+  group: Prometheus - Storage
+  label: VolumeMode
+  type: enum
+  options:
+  - Filesystem
+  - Block
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+- variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.volumeName
+  group: Prometheus - Storage
+  label: Volume Name
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+- variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage
+  group: Prometheus - Storage
+  label: Size
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+- variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.selector
+  group: Prometheus - Storage
+  label: Selector
+  description: Configures which volumes to consider for binding based on the labels attached to them
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+- variable: specifyPrometheusPersistentStorageDatasource
+  group: Prometheus - Storage
+  label: Specify Datasource
+  description: Specify any existing CR that implements data population (i.e. VolumeSnapshot object or PVC) to be used by the PV
+  type: boolean
+  default: false
+  show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+  show_subquestion_if: true
+  subquestions:
+  - variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.dataSource.apiGroup
+    group: Prometheus - Storage
+    label: Data Source API Group
+    type: string
+    show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+  - variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.dataSource.kind
+    group: Prometheus - Storage
+    label: Data Source Kind
+    type: string
+    show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+  - variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.dataSource.name
+    group: Prometheus - Storage
+    label: Data Source Name
+    type: string
+    show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
+# Prometheus - Resource Requests & Limits
+- variable: prometheus.prometheusSpec.resources.limits.cpu
+  group: Prometheus - Resource Requests & Limits
+  label: CPU Resource Limit
+  default: 1000m
+  description: Resource Limits on CPU usage for Prometheus
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheus.enabled=true&&setPrometheusResourceLimits=true"
+- variable: prometheus.prometheusSpec.resources.limits.memory
+  group: Prometheus - Resource Requests & Limits
+  label: Memory Resource Limit
+  default: 1000Mi
+  description: Resource Limits on Memory usage for Prometheus
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheus.enabled=true&&setPrometheusResourceLimits=true"
+- variable: prometheus.prometheusSpec.resources.requests.cpu
+  group: Prometheus - Resource Requests & Limits
+  label: CPU Resource Request
+  default: 750m
+  description: Resource Request on CPU usage for Prometheus
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheus.enabled=true&&setPrometheusResourceLimits=true"
+- variable: prometheus.prometheusSpec.resources.requests.memory
+  group: Prometheus - Resource Requests & Limits
+  label: Memory Resource Request
+  default: 750Mi
+  description: Resource Requests on Memory usage for Prometheus
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheus.enabled=true&&setPrometheusResourceLimits=true"
+# Prometheus - Scheduling Constraints
+- variable: prometheus.prometheusSpec.nodeSelector
+  group: Prometheus - Scheduling Constraints
+  label: Node Selector
+  description: Assign custom node selector rules to the Prometheus
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusSchedulingConstraints=true"
+- variable: prometheus.prometheusSpec.tolerations
+  group: Prometheus - Scheduling Constraints
+  label: Tolerations
+  description: Assign custom tolerations to the Prometheus
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusSchedulingConstraints=true"
+- variable: prometheus.prometheusSpec.affinity
+  group: Prometheus - Scheduling Constraints
+  label: Affinity Rules
+  description: Assign custom affinity rules to the Prometheus
+  type: string
+  show_if: "prometheus.enabled=true&&setPrometheusSchedulingConstraints=true"
+# Prometheus - Network
+- variable: prometheus.service.type
+  group: Prometheus - Network
+  label: Service Type
+  default: NodePort
+  description: The type of Service to deploy with Prometheus. If using an Ingress, ClusterIP should be selected.
+  type: enum
+  options:
+  - ClusterIP
+  - NodePort
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.service.port
+  group: Prometheus - Network
+  label: Port
+  description: Port for Prometheus Service to listen on
+  default: 9090
+  type: int
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.service.targetPort
+  group: Prometheus - Network
+  label: Target Port
+  description: Port used by Prometheus Service internally
+  default: 9090
+  type: int
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.service.nodePort
+  group: Prometheus - Network
+  label: Node Port
+  description: Port exposed on the Node for the Prometheus Service
+  default: 30090
+  type: int
+  show_if: "prometheus.enabled=true&&prometheus.service.type=NodePort"
+- variable: prometheus.ingress.enabled
+  group: Prometheus - Network
+  label: Use Ingress
+  description: Creates a customizable Ingress for Prometheus
+  default: false
+  type: boolean
+  show_if: "prometheus.enabled=true"
+- variable: prometheus.prometheusSpec.externalUrl
+  group: Prometheus - Network
+  label: External URL
+  description: The external URL the Prometheus instances will be available under
+  default: ""
+  required: false
+  type: string
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+# Prometheus - Ingress
+- variable: prometheus.ingress.hosts
+  group: Prometheus - Ingress
+  label: Hosts
+  type: string
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+- variable: prometheus.ingress.paths
+  group: Prometheus - Ingress
+  label: Paths
+  type: string
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+- variable: prometheus.ingress.annotations
+  group: Prometheus - Ingress
+  label: Annotations
+  type: string
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+- variable: prometheus.ingress.labels
+  group: Prometheus - Ingress
+  label: Labels
+  type: string
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+- variable: prometheus.ingress.tls.hosts
+  group: Prometheus - Ingress
+  label: TLS Hosts
+  description: List of hosts included in the TLS certificate. Defaults to wildcard host setting
+  type: string
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+- variable: prometheus.ingress.tls.secretName
+  group: Prometheus - Ingress
+  label: TLS Secret
+  description: Must contains keys for tls.crt and tls.key
+  type: secret
+  show_if: "prometheus.enabled=true&&prometheus.ingress.enabled=true"
+# Grafana
+- variable: configureGrafanaAdminCredentials
+  group: Grafana
+  label: Configure Admin Credentials
+  description: Configure the admin credentials used to log into Grafana
+  type: enum
+  options:
+  - Default
+  - Password
+  - Secret
+  default: Default
+  show_if: "grafana.enabled=true"
+- variable: grafana.ingress.enabled
+  group: Grafana
+  label: Use Ingress
+  description: Creates a customizable Ingress for Grafana
+  default: false
+  type: boolean
+  show_if: "grafana.enabled=true"
+- variable: grafana.persistence.enabled
+  group: Grafana
+  label: Enable Persistent Storage
+  description: Use Persistent Volumes to store data
+  type: boolean
+  default: false
+  show_if: "grafana.enabled=true"
+# Grafana - Admin Credentials
+- variable: grafana.admin.existingSecret
+  group: Grafana - Admin Credentials
+  label: Admin Credentials Secret
+  description: A secret that contains the a username and password to be used for admin credentials to Grafana
+  type: secret
+  required: true
+  show_if: "grafana.enabled=true&&configureGrafanaAdminCredentials=Secret"
+- variable: grafana.admin.userKey
+  group: Grafana - Admin Credentials
+  label: Key for Username
+  description: The key within the Secret that contains the username
+  type: string
+  required: true
+  show_if: "grafana.enabled=true&&configureGrafanaAdminCredentials=Secret"
+- variable: grafana.admin.passwordKey
+  group: Grafana - Admin Credentials
+  label: Key for Password
+  description: The key within the Secret that contains the password
+  type: string
+  required: true
+  show_if: "grafana.enabled=true&&configureGrafanaAdminCredentials=Secret"
+- variable: grafana.adminPassword
+  group: Grafana - Admin Credentials
+  label: Admin Password
+  type: password
+  description: Password to use for Grafana; if not specified, the default defined in values.yaml is used.
+  required: false
+  show_if: "grafana.enabled=true&&configureGrafanaAdminCredentials=Password"
+# Grafana - Ingress
+- variable: grafana.ingress.hosts
+  group: Grafana - Ingress
+  label: Hosts
+  type: string
+  show_if: "grafana.enabled=true&&grafana.ingress.enabled=true"
+- variable: grafana.ingress.paths
+  group: Grafana - Ingress
+  label: Paths
+  type: string
+  show_if: "grafana.enabled=true&&grafana.ingress.enabled=true"
+- variable: grafana.ingress.annotations
+  group: Grafana - Ingress
+  label: Annotations
+  type: string
+  show_if: "grafana.enabled=true&&grafana.ingress.enabled=true"
+- variable: grafana.ingress.labels
+  group: Grafana - Ingress
+  label: Labels
+  type: string
+  show_if: "grafana.enabled=true&&grafana.ingress.enabled=true"
+- variable: grafana.ingress.tls.hosts
+  group: Grafana - Ingress
+  label: TLS Hosts
+  description: List of hosts included in the TLS certificate. Defaults to wildcard host setting
+  type: string
+  show_if: "grafana.enabled=true&&grafana.ingress.enabled=true"
+- variable: grafana.ingress.tls.secretName
+  group: Grafana - Ingress
+  label: TLS Secret
+  description: Must contains keys for tls.crt and tls.key
+  type: secret
+  show_if: "grafana.enabled=true&&grafana.ingress.enabled=true"
+# Grafana - Storage
+- variable: grafanaUseExistingClaim
+  default: false
+  group: Grafana - Storage
+  label: Use Existing PVC
+  type: boolean
+  show_if: "grafana.persistence.enabled=true"
+- variable: grafana.persistence.existingClaim
+  group: Grafana - Storage
+  label: Existing PVC
+  description: Existing PVC to persist data in
+  type: pvc
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=true"
+- variable: grafana.persistence.type
+  group: Grafana - Storage
+  label: Type of Persistence
+  type: enum
+  options:
+  - pvc
+  - statefulset
+  default: pvc
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false"
+- variable: grafana.persistence.accessModes
+  group: Grafana - Storage
+  label: Access Modes
+  type: enum
+  options:
+  - ReadWriteOnce
+  - ReadOnlyMany
+  - ReadWriteMany
+  description: Persistence access modes
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false"
+- variable: grafana.persistence.storageClassName
+  group: Grafana - Storage
+  label: Storage Class
+  type: storageclass
+  description: Type of persistent volume claim
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false"
+- variable: grafana.persistence.size
+  group: Grafana - Storage
+  label: Size
+  type: string
+  default: 10Gi
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  description: Size of persistent volume claim
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false"
+- variable: grafana.persistence.subPath
+  group: Grafana - Storage
+  label: Use Subpath
+  type: string
+  description: Mount a subpath of the persistent volume
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true"
+- variable: grafana.persistence.annotations
+  group: Grafana - Storage
+  label: PVC Annotations
+  type: string
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false&&grafana.persistence.type=pvc"
+- variable: grafana.persistence.finalizers
+  group: Grafana - Storage
+  label: PVC Finalizers
+  type: string
+  show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false&&grafana.persistence.type=pvc"
+# Prometheus Operator
+- variable: prometheusOperator.hostNetwork
+  group: Prometheus Operator
+  label: Use Host Network for Operator Pods
+  description: Required for use in Managed Kubernetes Clusters (i.e. EKS, AKS, GKE) with custom CNI (i.e. Calico)
+  default: false
+  type: boolean
+  show_if: "prometheusOperator.enabled=true"
+- variable: acceptOrDenyNamespaces
+  default: Default
+  group: Prometheus Operator
+  label: Configure Namespace(s) To Search For Prometheus CRs
+  description: Allows you to accept or deny namespaces to search for Prometheus CRs.
+  type: enum
+  options:
+  - All Namespaces
+  - Accept
+  - Deny
+  required: true
+  show_if: "prometheusOperator.enabled=true"
+- variable: setPrometheusOperatorResourceLimits
+  group: Prometheus Operator
+  label: Set Custom Resource Limits & Requests
+  description: Set custom resource limits and requests on the Prometheus Operator deployment
+  type: boolean
+  required: true
+  default: false
+  show_if: "prometheusOperator.enabled=true"
+- variable: setPrometheusOperatorSchedulingConstraints
+  group: Prometheus Operator
+  label: Set Custom Scheduling Constraints
+  description: Set custom nodeSelector, tolerations, and affinities for the Prometheus Operator deployment
+  type: boolean
+  required: true
+  default: false
+  show_if: "prometheusOperator.enabled=true"
+# Prometheus Operator - Namespaces
+- variable: prometheusOperator.namespaces.releaseNamespace
+  group: Prometheus Operator - Namespaces
+  label: Include Release Namespace
+  description: Watch Prometheus CRs created in the Deployment Namespace
+  default: true
+  type: boolean
+  required: true
+  show_if: "prometheusOperator.enabled=true&&acceptOrDenyNamespaces=Accept"
+- variable: prometheusOperator.namespaces.additionalNamespaces
+  group: Prometheus Operator - Namespaces
+  label: Additional Namespaces to Allow
+  description: Watch Prometheus CRs in these namespaces
+  type: string
+  required: true
+  show_if: "prometheusOperator.enabled=true&&acceptOrDenyNamespaces=Accept"
+- variable: prometheusOperator.denyNamespaces
+  group: Prometheus Operator - Namespaces
+  label: Namespaces to Deny
+  description: Ignore Prometheus CRs created in these namespaces
+  type: string
+  required: true
+  show_if: "prometheusOperator.enabled=true&&acceptOrDenyNamespaces=Deny"
+# Prometheus Operator - Resource Requests & Limits
+- variable: prometheusOperator.resources.limits.cpu
+  group: Prometheus Operator - Resource Requests & Limits
+  label: CPU Resource Limit
+  description: Resource Limits on CPU usage for Prometheus Operator
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorResourceLimits=true"
+- variable: prometheusOperator.resources.limits.memory
+  group: Prometheus Operator - Resource Requests & Limits
+  label: Memory Resource Limit
+  description: Resource Limits on Memory usage for Prometheus Operator
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorResourceLimits=true"
+- variable: prometheusOperator.resources.requests.cpu
+  group: Prometheus Operator - Resource Requests & Limits
+  label: CPU Resource Request
+  description: Resource Request on CPU usage for Prometheus Operator
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorResourceLimits=true"
+- variable: prometheusOperator.resources.requests.memory
+  group: Prometheus Operator - Resource Requests & Limits
+  label: Memory Resource Request
+  description: Resource Requests on Memory usage for Prometheus Operator
+  type: string
+  # valid_chars: "[0-9]+[mkMGTPE][i]?"
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorResourceLimits=true"
+# Prometheus Operator - Scheduling Constraints
+- variable: prometheusOperator.nodeSelector
+  group: Prometheus Operator - Scheduling Constraints
+  label: Node Selector
+  description: Assign custom node selector rules to the Prometheus Operator
+  type: string
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorSchedulingConstraints=true"
+- variable: prometheusOperator.tolerations
+  group: Prometheus Operator - Scheduling Constraints
+  label: Tolerations
+  description: Assign custom tolerations to the Prometheus Operator
+  type: string
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorSchedulingConstraints=true"
+- variable: prometheusOperator.affinity
+  group: Prometheus Operator - Scheduling Constraints
+  label: Affinity Rules
+  description: Assign custom affinity rules to the Prometheus Operator
+  type: string
+  show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorSchedulingConstraints=true"
+# Prometheus Adapter 
+- variable: prometheus-adapter.prometheus.url
+  group: Prometheus Adapter
+  label: Prometheus Service URL
+  description: Points to a Prometheus service at http://<prometheus-service-name>.<deployment-namespace>.svc
+  default: http://rancher-monitoring-v2-prometheus.rancher-monitoring-v2.svc
+  type: string
+  show_if: "prometheus-adapter.enabled=true"
+- variable: prometheus-adapter.prometheus.port
+  group: Prometheus Adapter
+  label: Prometheus Service Port
+  description: The port where the Prometheus service can be found
+  default: 9090
+  type: int
+  show_if: "prometheus-adapter.enabled=true"
+- variable: prometheus-adapter.rules.default
+  group: Prometheus Adapter
+  label: Use Default Rules
+  description: Use default Prometheus Adapter rules for exposing custom metrics.
+  type: boolean
+  default: true
+  show_if: "prometheus-adapter.enabled=true"
+- variable: prometheus-adapter.rules.existing
+  group: Prometheus Adapter
+  label: Custom Rules Configuration
+  description: Specify a ConfigMap with key 'config.yaml' that has Prometheus Adapter rules for exposing custom metrics
+  type: string
+  show_if: "prometheus-adapter.enabled=true&&prometheus-adapter.rules.default=false"

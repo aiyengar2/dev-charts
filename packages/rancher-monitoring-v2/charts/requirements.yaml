@@ -1,0 +1,87 @@
+dependencies:
+
+  - name: kube-state-metrics
+    version: "2.8.*"
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    condition: kubeStateMetrics.enabled
+
+  - name: prometheus-node-exporter
+    version: "1.10.*"
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    condition: nodeExporter.enabled
+
+  - name: grafana
+    version: "5.3.*"
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    condition: grafana.enabled
+
+  - name: prometheus-adapter
+    version: 2.4.*
+    repository: https://kubernetes-charts.storage.googleapis.com/
+    condition: prometheus-adapter.enabled
+
+  - name: cattle-pushprox
+    alias: rkeControllerManager
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: rkeControllerManager.enabled
+
+  - name: cattle-pushprox
+    alias: rkeScheduler
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: rkeScheduler.enabled
+
+  - name: cattle-pushprox
+    alias: rkeProxy
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: rkeProxy.enabled
+
+  - name: cattle-pushprox
+    alias: rkeEtcd
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: rkeEtcd.enabled
+
+  - name: cattle-pushprox
+    alias: k3sControllerManager
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: k3sControllerManager.enabled
+
+  - name: cattle-pushprox
+    alias: k3sScheduler
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: k3sScheduler.enabled
+  
+  - name: cattle-pushprox
+    alias: k3sProxy
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: k3sProxy.enabled
+
+  - name: cattle-pushprox
+    alias: kubeAdmControllerManager
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: kubeAdmControllerManager.enabled
+
+  - name: cattle-pushprox
+    alias: kubeAdmScheduler
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: kubeAdmScheduler.enabled
+
+  - name: cattle-pushprox
+    alias: kubeAdmProxy
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: kubeAdmProxy.enabled
+
+  - name: cattle-pushprox
+    alias: kubeAdmEtcd
+    version: 0.1.0
+    repository: file://../../cattle-pushprox
+    condition: kubeAdmEtcd.enabled

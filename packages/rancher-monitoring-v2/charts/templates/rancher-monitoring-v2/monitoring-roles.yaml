@@ -1,0 +1,85 @@
+{{- if .Values.monitoringRoles }}{{- if .Values.monitoringRoles.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-admin
+  labels: {{ include "prometheus-operator.labels" . | nindent 4 }}
+  {{- if .Values.monitoringRoles.aggregateRolesForRBAC }}
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+  {{- end }}
+rules:
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["prometheuses"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["alertmanagers"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["servicemonitors"]
+  verbs: ["*"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["podmonitors"]
+  verbs: ["*"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["prometheusrules"]
+  verbs: ["*"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps", "secrets"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-edit
+  labels: {{ include "prometheus-operator.labels" . | nindent 4 }}
+  {{- if .Values.monitoringRoles.aggregateRolesForRBAC }}
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+  {{- end }}
+rules:
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["prometheuses"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["alertmanagers"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["servicemonitors"]
+  verbs: ["*"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["podmonitors"]
+  verbs: ["*"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["prometheusrules"]
+  verbs: ["*"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps", "secrets"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: monitoring-view
+  labels: {{ include "prometheus-operator.labels" . | nindent 4 }}
+  {{- if .Values.monitoringRoles.aggregateRolesForRBAC }}
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  {{- end }}
+rules:
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["prometheuses"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["alertmanagers"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["servicemonitors"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["podmonitors"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["monitoring.coreos.com"] # "" indicates the core API group
+  resources: ["prometheusrules"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "watch", "list"]
+{{- end }}{{- end }}
