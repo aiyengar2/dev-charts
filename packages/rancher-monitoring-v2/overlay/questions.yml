@@ -295,6 +295,7 @@ questions:
   group: Prometheus - Service Monitors
   label: Select Namespaces by Label
   type: string
+  default: "{}"
   description: Selects namespaces by the labels attached to the namespace. By default, search the deployment namespace.
   show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
 - variable: prometheus.prometheusSpec.serviceMonitorSelector
@@ -302,12 +303,14 @@ questions:
   label: Select ServiceMonitors by Label
   description: Selects ServiceMonitors by the labels attached to the resource. By default, all resources are selected.
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
 # Prometheus - Pod Monitors
 - variable: prometheus.prometheusSpec.podMonitorNamespaceSelector
   group: Prometheus - Pod Monitors
   label: Select Namespaces by Label
   type: string
+  default: "{}"
   description: Selects namespaces by the labels attached to the namespace. By default, search the deployment namespace.
   show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
 - variable: prometheus.prometheusSpec.podMonitorSelector
@@ -315,6 +318,7 @@ questions:
   label: Select PodMonitors by Labels
   description: Selects PodMonitors by the labels attached to the resource. By default, all resources are selected.
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
 # Prometheus - Prometheus Rules
 - variable: prometheus.prometheusSpec.rulesNamespaceSelector
@@ -322,12 +326,14 @@ questions:
   label: Select Namespaces by Label
   description: Selects namespaces by the labels attached to the namespace. By default, search the deployment namespace.
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
 - variable: prometheus.prometheusSpec.rulesSelector
   group: Prometheus - Prometheus Rules
   label: Select PrometheusRules by Label
   description: Selects PrometheusRules by the labels attached to the resource. By default, all resources are selected.
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusCustomResourceSelectors=true"
 # Prometheus - Storage
 - variable:  prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.accessModes
@@ -368,6 +374,7 @@ questions:
   label: Selector
   description: Configures which volumes to consider for binding based on the labels attached to them
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusPersistenceStorage=true"
 - variable: specifyPrometheusPersistentStorageDatasource
   group: Prometheus - Storage
@@ -432,18 +439,21 @@ questions:
   label: Node Selector
   description: Assign custom node selector rules to the Prometheus
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusSchedulingConstraints=true"
 - variable: prometheus.prometheusSpec.tolerations
   group: Prometheus - Scheduling Constraints
   label: Tolerations
   description: Assign custom tolerations to the Prometheus
   type: string
+  default: "[]"
   show_if: "prometheus.enabled=true&&setPrometheusSchedulingConstraints=true"
 - variable: prometheus.prometheusSpec.affinity
   group: Prometheus - Scheduling Constraints
   label: Affinity Rules
   description: Assign custom affinity rules to the Prometheus
   type: string
+  default: "{}"
   show_if: "prometheus.enabled=true&&setPrometheusSchedulingConstraints=true"
 # Prometheus - Network
 - variable: prometheus.service.type
@@ -633,7 +643,6 @@ questions:
   options:
   - pvc
   - statefulset
-  default: pvc
   show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false"
 - variable: grafana.persistence.accessModes
   group: Grafana - Storage
@@ -655,7 +664,6 @@ questions:
   group: Grafana - Storage
   label: Size
   type: string
-  default: 10Gi
   # valid_chars: "[0-9]+[mkMGTPE][i]?"
   description: Size of persistent volume claim
   show_if: "grafana.enabled=true&&grafana.persistence.enabled=true&&grafanaUseExistingClaim=false"
@@ -725,6 +733,7 @@ questions:
   label: Additional Namespaces to Allow
   description: Watch Prometheus CRs in these namespaces
   type: string
+  default: "[]"
   required: true
   show_if: "prometheusOperator.enabled=true&&acceptOrDenyNamespaces=Accept"
 - variable: prometheusOperator.denyNamespaces
@@ -732,6 +741,7 @@ questions:
   label: Namespaces to Deny
   description: Ignore Prometheus CRs created in these namespaces
   type: string
+  default: "[]"
   required: true
   show_if: "prometheusOperator.enabled=true&&acceptOrDenyNamespaces=Deny"
 # Prometheus Operator - Resource Requests & Limits
@@ -769,18 +779,21 @@ questions:
   label: Node Selector
   description: Assign custom node selector rules to the Prometheus Operator
   type: string
+  default: "{}"
   show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorSchedulingConstraints=true"
 - variable: prometheusOperator.tolerations
   group: Prometheus Operator - Scheduling Constraints
   label: Tolerations
   description: Assign custom tolerations to the Prometheus Operator
   type: string
+  default: "[]"
   show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorSchedulingConstraints=true"
 - variable: prometheusOperator.affinity
   group: Prometheus Operator - Scheduling Constraints
   label: Affinity Rules
   description: Assign custom affinity rules to the Prometheus Operator
   type: string
+  default: "{}"
   show_if: "prometheusOperator.enabled=true&&setPrometheusOperatorSchedulingConstraints=true"
 # Prometheus Adapter 
 - variable: prometheus-adapter.prometheus.url

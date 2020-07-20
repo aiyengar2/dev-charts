@@ -1,0 +1,22 @@
+{{- if .Values.monitoringRoles }}
+{{- if and .Values.monitoringRoles.create .Values.grafana.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: grafana-config-edit
+  labels: {{ include "prometheus-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps", "secrets"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: grafana-config-view
+  labels: {{ include "prometheus-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "watch", "list"]
+{{- end }}{{- end }}
