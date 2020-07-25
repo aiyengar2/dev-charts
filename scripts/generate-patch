@@ -39,8 +39,19 @@ for f in packages/*; do
 				curl -sLf ${url} | tar xvzf - -C ${f}/charts-original --strip ${fields} ${subdirectory} > /dev/null 2>&1
 			fi
 			if [[ -d ${f}/charts ]]; then
+				if [[ -d ${f}/charts-crd ]]; then
+					name=$(cat ${f}/charts/Chart.yaml | yq r - 'name')
+					mkdir -p ${f}/charts/crds/
+					mv ${f}/charts-crd/templates/* ${f}/charts/crds/
+					mv ${f}/charts/templates/validate-install-${name}-crd.yaml ${f}/charts-crd/templates
+				fi
 				diff -x *.tgz -x *.lock -uNr ${f}/charts-original ${f}/charts > ${f}/$(basename -- ${f}).patch || true
 				remove_timestamp_from_diff
+				if [[ -d ${f}/charts-crd ]]; then
+					mv ${f}/charts/crds/* ${f}/charts-crd/templates/
+					rm -rf ${f}/charts/crds/
+					mv ${f}/charts-crd/templates/validate-install-${name}-crd.yaml ${f}/charts/templates
+				fi
 			fi
 			rm -rf ${f}/charts-original
 		fi
